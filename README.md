@@ -1,8 +1,7 @@
 # Future Self
 
-A digital time-capsule journal that feels like writing letters by candlelight — to be opened by your future self exactly when you choose.
-
-Seal memories, thoughts, voice notes or short videos with a custom wax stamp. Watch them rest quietly in your leather-bound journal until the delivery date arrives.
+*Write a letter. Seal it with wax. Let your future self find it.*
+Inspired by a quiet café in Tokyo where visitors write letters to themselves, seal them, and receive them a year later — Future Self Messenger is a digital time capsule journal. Capture a moment in text, voice, or video, choose your delivery date, press your wax seal, and forget about it. On the day it's due, it arrives back to you like a gift from the past.
 
 ---
 
@@ -23,62 +22,24 @@ Seal memories, thoughts, voice notes or short videos with a custom wax stamp. Wa
 # The Ritual
 
 Sit at a quiet desk.
-Feel the texture of cream paper under your fingers.
-Hear the soft scratch of a fountain pen.
-Watch wax drip and harden around your chosen symbol.
-Close the book — and let time carry your words forward.
-
-This is a slow, private conversation across years.
-No feeds. No likes. Just you, today, speaking gently to you, tomorrow.
+You write something honest — a letter, a voice note, a video — addressed to the person you'll be in one, two, or five years. You choose a wax colour, pick a symbol, pour the seal. The capsule locks. You can see it sitting there in your journal, sealed, but you cannot open it. On the delivery date, the app unlocks it, sends you an email, and your past self's words are waiting.
+The whole thing runs on free infrastructure. No subscription, no credit card, no expiry.
 
 ---
 
 # Core Features
 
-### Three capsule formats
-
-• **Written letters** on real lined paper
-• **Voice recordings** with pulsing waveform & live transcript highlighting
-• **Short video messages**
-
----
-
-### Immersive 3D journal
-
-Floating leather book with subtle hover tilt and gold detailing
-Realistic page-flip animation
-Left page shows faded previous entry; right page holds the current one
-
----
-
-### Wax seal studio
-
-Pour animated wax in your chosen color
-Upload any image (e.g. pet photo) → it becomes an engraved stamp
-Candle flicker → seal presses down with organic drip texture
-
----
-
-### Personalized cover
-
-Choose from **5 leather tones** (deep sage, midnight blue, terracotta, etc.)
-Custom journal title & optional bio
-Live preview of your book floating beside the form
-
----
-
-### Gentle timed delivery
-
-Capsules seal instantly and become immutable
-Hourly check delivers them (beautiful arrival email via Resend + in-app reveal)
-Confetti celebration on sealing
-
----
-
-### Auth & ownership
-
-Email + Google sign-in
-Supabase row-level security — your capsules stay private
+- **Three capsule types** — written letter, voice recording, or video
+- **Wax seal studio** — 8 wax colours, 12 symbols, upload your own artwork to etch into the seal
+- **Reflection prompts** — 8 handwritten prompts to spark honest writing
+- **Leather journal** — 5 cover colours, custom title, animated 3D book on your dashboard
+- **Scheduled delivery** — choose 1 month to 5 years; Vercel cron checks hourly
+- **Delivery email** — beautiful HTML letter sent via Resend on delivery day
+- **Sealed = locked** — capsules are genuinely unreadable until the date arrives
+- **Audio player** — waveform visualizer with live word-by-word transcript highlighting
+- **Page-flip journal** — two-page book spread with CSS 3D flip animation
+- **Google + email auth** — via Supabase Auth
+- **Fully free** — Supabase free tier + Vercel Hobby + Resend free tier
 
 ---
 
@@ -110,129 +71,180 @@ Supabase row-level security — your capsules stay private
 
 # Tech Stack
 
-**Frontend**
-Next.js App Router
-React Server Components
+| Layer | Technology |
+|---|---|
+| Frontend + API | Next.js 14 App Router, TypeScript |
+| Database + Auth | Supabase (Postgres + Row Level Security) |
+| File storage | Supabase Storage (private buckets, signed URLs) |
+| Email | Resend (3,000 free emails/month) |
+| Hosting | Vercel Hobby (free, auto-deploys from GitHub) |
+| Scheduled delivery | Vercel Cron Jobs (hourly) |
 
-**Styling**
-Tailwind CSS with custom palette
-(Cream paper, terracotta/rust, gold foil, dark walnut)
-
-**Fonts**
-
-Instrument Serif (display)
-Crimson Pro (body)
-DM Mono (UI)
-
-**Animations & 3D**
-
-Framer Motion (page flips, tilts)
-CSS perspective
-
-**Canvas Wax Seal**
-
-HTML Canvas with layered gradients
-Custom drip brushes
-
-**Backend / Storage**
-
-Supabase
-
-* Auth
-* Postgres
-* Storage buckets
-
-  * `capsule-media`
-  * `seal-art`
-  * `cover-images`
-
-**Emails**
-
-Resend (fallback to in-app if no API key)
-
-**Scheduling**
-
-Vercel Cron (hourly capsule delivery)
 
 ---
 
-# Quick Start (Local)
+## Running locally
 
-Clone the repository
+### Prerequisites
+
+- Node.js 18+
+- A free [Supabase](https://supabase.com) project
+- A free [Resend](https://resend.com) account (optional — app works without email)
+
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/future-self.git
-cd future-self
-```
-
-Install dependencies
-
-```bash
+git clone https://github.com/YOUR_USERNAME/future-self-messenger.git
+cd future-self-messenger/app
 npm install
 ```
 
-Create environment file
+### 2. Set up Supabase
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to **SQL Editor** and run the entire contents of `supabase/schema.sql`
+   - This creates the `profiles` and `capsules` tables, RLS policies, storage buckets, and a trigger that auto-creates a profile when someone signs up
+3. Go to **Settings → API** and copy:
+   - Project URL
+   - `anon` / public key
+   - `service_role` key
+
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env.local
 ```
 
-Fill the environment variables
+Open `.env.local` and fill in your values:
 
-* Supabase keys
-* Resend API key (optional)
-* CRON_SECRET
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-role-key
 
-Start development server
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+RESEND_API_KEY=re_xxxxxxxxxxxx        # optional
+FROM_EMAIL=noreply@yourdomain.com     # optional
+
+CRON_SECRET=any-long-random-string    # generate: openssl rand -hex 32
+```
+
+> **Important:** Do not add inline comments on the same line as values — Next.js will include them as part of the value.
+
+### 4. Run
 
 ```bash
 npm run dev
 ```
 
-App will run at:
-
-```
-http://localhost:3000
-```
-
-Detailed deployment guide → `DEPLOY.md`
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-# Deployment (Vercel — ~10 min)
-
-1. Push the repo to GitHub
-2. Go to
+## Project structure
 
 ```
-https://vercel.com/new
+app/
+├── supabase/
+│   └── schema.sql              # Run once in Supabase SQL Editor
+├── src/
+│   ├── app/
+│   │   ├── page.tsx            # Landing page
+│   │   ├── login/              # Email + Google sign-in
+│   │   ├── signup/             # Account creation
+│   │   ├── dashboard/          # Floating journal book + capsule list
+│   │   ├── new-entry/          # 3-step capsule creation flow
+│   │   ├── journal/            # Two-page book spread reader
+│   │   ├── settings/           # Cover customisation + profile
+│   │   ├── auth/callback/      # OAuth redirect handler
+│   │   └── api/
+│   │       ├── capsules/       # GET list, POST create
+│   │       ├── capsules/[id]/  # GET, PATCH, DELETE single capsule
+│   │       ├── upload/         # Media + seal art file uploads
+│   │       ├── profile/        # GET + PATCH profile
+│   │       └── cron/deliver/   # Hourly delivery job
+│   ├── components/
+│   │   └── WaxSeal.tsx         # Canvas-rendered wax seal
+│   ├── lib/
+│   │   ├── supabase-browser.ts # Client-side Supabase (use client)
+│   │   ├── supabase-server.ts  # Server-side Supabase + admin client
+│   │   └── email.ts            # Resend delivery email
+│   ├── types/
+│   │   └── index.ts            # Shared TypeScript types
+│   └── middleware.ts           # Auth-guarded route protection
+├── vercel.json                 # Hourly cron schedule
+└── .env.example                # Environment variable template
 ```
-
-3. Import the repository
-4. Add environment variables from `.env.example`
-5. Deploy
-
-After deployment:
-
-Update **Supabase Auth Redirect URLs** with your Vercel domain.
 
 ---
 
-## Test Cron Delivery
+## Deploying to Vercel
 
+1. Push to GitHub (already done)
+2. Go to [vercel.com](https://vercel.com) → **Add New Project** → import your repo
+3. Add all environment variables from `.env.example` in the Vercel dashboard
+   - Change `NEXT_PUBLIC_APP_URL` to your Vercel URL
+4. Deploy
+
+Then in Supabase → **Authentication → URL Configuration**:
+- Set **Site URL** to `https://your-app.vercel.app`
+- Add `https://your-app.vercel.app/auth/callback` to **Redirect URLs**
+
+The cron job in `vercel.json` will run automatically every hour and deliver any due capsules.
+
+To test delivery manually:
 ```bash
+# Force a capsule to be due (run in Supabase SQL Editor)
+UPDATE capsules SET delivery_at = NOW() - interval '1 minute' WHERE status = 'sealed' LIMIT 1;
+
+# Trigger the cron endpoint
 curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
-https://your-app.vercel.app/api/cron/deliver
+     https://your-app.vercel.app/api/cron/deliver
 ```
 
 ---
 
-# Contributing
+## Database schema
 
-Pull requests are welcome — especially around:
+Two tables, both with Row Level Security — users can only ever read or write their own rows.
 
-• Smoother mobile interactions
-• Accessibility improvements (ARIA + keyboard navigation)
-• Performance optimization for canvas and animation effects
+**`profiles`** — extends Supabase Auth users with journal customisation fields (cover colour, cover title, name, bio).
+
+**`capsules`** — one row per time capsule. Key fields:
+
+| Column | Description |
+|---|---|
+| `type` | `text`, `audio`, or `video` |
+| `content` | Written text (text capsules) |
+| `media_path` | Storage path in `capsule-media` bucket |
+| `delivery_at` | When to unlock (1 month – 10 years) |
+| `seal_color` | Hex colour of the wax seal |
+| `seal_emoji` | Symbol etched into the seal |
+| `status` | `sealed` → `delivered` → (or `failed` on cron error) |
+| `email_sent` | Whether the delivery email was sent |
+
+Media is stored in private Supabase Storage buckets. Signed URLs (1-hour expiry) are generated at read time, only for delivered capsules.
+
+---
+
+## Free tier limits
+
+| Service | Limit | Notes |
+|---|---|---|
+| Supabase DB | 500 MB | Thousands of capsules |
+| Supabase Storage | 1 GB | ~200 audio clips or ~50 short videos |
+| Supabase Auth | 50,000 MAU | More than enough |
+| Vercel Hobby | 100 GB bandwidth/month | Very generous |
+| Vercel Cron | Hourly | Delivery accuracy: ±1 hour |
+| Resend | 3,000 emails/month | Falls back to in-app only if exceeded |
+
+---
+
+## Inspiration
+
+This project began with a video about a café in Tokyo that offers a peculiar ritual: you write a letter to yourself, seal it with wax, and drop it into their mailbox. They post it back to you exactly one year later. There's something profound about the delay — the forced perspective, the surprise of meeting your past self's handwriting, the realisation of how much (or how little) has changed.
+
+This app is an attempt to carry that ritual into everyday life.
 
 ---
