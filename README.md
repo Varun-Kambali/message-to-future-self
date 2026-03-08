@@ -9,7 +9,7 @@ Seal memories, thoughts, voice notes or short videos with a custom wax stamp. Wa
 ## Demo
 
 <p align="center">
-  <img src="app/media/working.mov" alt="Future Self Demo Flow" width="900"/>
+  <img src="app/media/working.gif" alt="Future Self Demo Flow" width="900"/>
 </p>
 
 <p align="center">
@@ -104,22 +104,6 @@ Supabase row-level security — your capsules stay private
 
 <p align="center">
   <img src="app/media/image3.png" alt="Wax seal creation studio" width="900"/>
-</p>
-
----
-
-### Dashboard
-
-<p align="center">
-  <img src="app/media/image4.png" alt="User dashboard with journals" width="900"/>
-</p>
-
----
-
-### Delivered Capsule Reveal
-
-<p align="center">
-  <img src="app/media/image5.png" alt="Delivered capsule reveal" width="900"/>
 </p>
 
 ---
@@ -243,16 +227,6 @@ https://your-app.vercel.app/api/cron/deliver
 
 ---
 
-# Roadmap Ideas
-
-* End-to-end encryption for capsules
-* Multiple journals / different themes
-* Audio/video transcription improvements
-* Mobile-first refinements (PWA)
-* Optional shared capsules (sealed for friends/family)
-
----
-
 # Contributing
 
 Pull requests are welcome — especially around:
@@ -262,32 +236,3 @@ Pull requests are welcome — especially around:
 • Performance optimization for canvas and animation effects
 
 ---
-
-# License
-
-MIT License
-
-See the `LICENSE` file for details.
-
----
-
-# Final Step
-
-Commit the images + README:
-
-```bash
-git add README.md
-git add app/media
-git commit -m "Add screenshots and demo to README"
-git push
-```
-
----
-
-If you'd like, I can also show you **3 small upgrades that make GitHub repos look extremely premium (like Stripe / Vercel repos)**:
-
-• **Feature cards with icons**
-• **side-by-side screenshot gallery**
-• **animated demo preview at the top**
-
-They make the repo look **10× more impressive to recruiters and devs.**
