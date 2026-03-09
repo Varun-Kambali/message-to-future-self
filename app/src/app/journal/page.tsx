@@ -132,21 +132,31 @@ export default function JournalPage() {
       <div style={{ display:'flex', width:'100%', maxWidth:840, filter:'drop-shadow(0 22px 60px rgba(0,0,0,0.75))' }}>
         {/* Left page — faded prev */}
         <div style={{ flex:1, minHeight:500, background:'linear-gradient(to right,#f4edd8,#ede5cc)', borderRadius:'10px 0 0 10px', padding:'38px 28px 28px 36px', position:'relative', overflow:'hidden', boxShadow:'inset -10px 0 22px rgba(0,0,0,0.1)' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.04, backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`, pointerEvents:'none', zIndex:0 }} />
           {Array.from({length:17},(_,i)=><div key={i} style={{ position:'absolute', left:50, right:12, top:52+i*27, height:1, background:'rgba(120,90,50,0.1)' }} />)}
           <div style={{ position:'absolute', left:42, top:0, bottom:0, width:1, background:'rgba(180,60,60,0.14)' }} />
-          <div style={{ position:'relative', zIndex:1, height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
-            {prev ? (
-              <div style={{ opacity:.4 }}>
-                <p style={{ fontFamily:'var(--mono)', fontSize:8, color:'#7a6050', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:10 }}>{new Date(prev.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase()}</p>
-                <p style={{ fontFamily:'var(--body)', fontSize:13, color:'#5a4030', lineHeight:1.9, fontStyle:'italic' }}>{(prev.content||prev.prompt||'').slice(0,200)}{(prev.content||prev.prompt||'').length>200?'…':''}</p>
-              </div>
-            ) : (
-              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', opacity:.15 }}>
-                <span style={{ fontSize:32, marginBottom:8 }}>✉</span>
-                <span style={{ fontFamily:'var(--serif)', fontStyle:'italic', color:'#5a4030', fontSize:14 }}>Begin your story</span>
-              </div>
-            )}
-            <div style={{ textAlign:'right', fontFamily:'var(--mono)', fontSize:8, color:'#b09880' }}>{page>0?page:''}</div>
+          <div style={{ position:'relative', zIndex:1, height:'100%', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center' }}>
+            <div style={{ textAlign:'center' }}>
+              <p style={{ fontFamily:'var(--mono)', fontSize:11, color:'#8a7060', letterSpacing:'0.18em', textTransform:'uppercase', marginBottom:10 }}>
+                Written on
+              </p>
+              <h2 style={{ fontFamily:'var(--serif)', fontSize:34, color:'#4a3f35', margin:0 }}>
+                {new Date(entry.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+              </h2>
+              
+              <div style={{ width:40, height:1.5, background:'rgba(196,98,45,0.25)', margin:'32px auto' }} />
+              
+              <p style={{ fontFamily:'var(--mono)', fontSize:11, color:'#8a7060', letterSpacing:'0.18em', textTransform:'uppercase', marginBottom:10 }}>
+                To be opened on
+              </p>
+              <h2 style={{ fontFamily:'var(--serif)', fontSize:34, color:'#1c1410', margin:0 }}>
+                {new Date(entry.delivery_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+              </h2>
+            </div>
+            
+            <div style={{ position:'absolute', bottom:0, left:0, width:'100%', textAlign:'center', fontFamily:'var(--mono)', fontSize:9, color:'#b09880' }}>
+              PG {page * 2 + 1}
+            </div>
           </div>
         </div>
 
@@ -155,32 +165,25 @@ export default function JournalPage() {
 
         {/* Right page — current, animated */}
         <div style={{ flex:1, background:'linear-gradient(to left,#f0e8d4,#ede5cc)', borderRadius:'0 10px 10px 0', padding:'38px 36px 28px 28px', position:'relative', overflow:'hidden', transformOrigin:'left center', transformStyle:'preserve-3d', animation:flipping?(flipDir==='next'?'pageFlipR 0.42s ease-in-out':'pageFlipL 0.42s ease-in-out'):'none' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.04, backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`, pointerEvents:'none', zIndex:0 }} />
           {Array.from({length:17},(_,i)=><div key={i} style={{ position:'absolute', left:12, right:50, top:52+i*27, height:1, background:'rgba(120,90,50,0.1)' }} />)}
           <div style={{ position:'absolute', right:42, top:0, bottom:0, width:1, background:'rgba(180,60,60,0.12)' }} />
 
           <div style={{ position:'relative', zIndex:1, height:'100%', display:'flex', flexDirection:'column' }}>
-            {/* Header */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16 }}>
-              <div>
-                <p style={{ fontFamily:'var(--mono)', fontSize:8, color:'#7a6050', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:3 }}>
-                  {new Date(entry.created_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
-                </p>
-                <p style={{ fontFamily:'var(--body)', fontSize:11, color:'#8a7060', fontStyle:'italic' }}>
-                  Delivers {new Date(entry.delivery_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
-                </p>
-              </div>
-              <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                <WaxSeal color={entry.seal_color} symbol={entry.seal_emoji} size={38} />
-                <span style={{ fontFamily:'var(--mono)', fontSize:8, letterSpacing:'0.09em', padding:'3px 7px', borderRadius:2, background:entry.status==='delivered'?'#e8f4e8':'#f5ede0', color:entry.status==='delivered'?'#2a6a2a':'#8a6030' }}>
+            {/* Header / Seal Pill */}
+            <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:20 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                {entry.status!=='sealed' && <WaxSeal color={entry.seal_color} symbol={entry.seal_emoji} size={32} />}
+                <span style={{ fontFamily:'var(--mono)', fontSize:9, letterSpacing:'0.1em', padding:'4px 8px', borderRadius:3, background:entry.status==='delivered'?'#e8f4e8':'#f5ede0', color:entry.status==='delivered'?'#2a6a2a':'#8a6030' }}>
                   {entry.status==='delivered'?'✓ DELIVERED':'🔒 SEALED'}
                 </span>
               </div>
             </div>
 
             {/* Prompt */}
-            {entry.prompt && (
-              <div style={{ borderLeft:'2px solid rgba(196,98,45,0.3)', paddingLeft:11, marginBottom:16 }}>
-                <p style={{ fontFamily:'var(--body)', fontStyle:'italic', fontSize:12.5, color:'#7a6050', lineHeight:1.65, margin:0 }}>"{entry.prompt}"</p>
+            {entry.prompt && entry.status==='delivered' && (
+              <div style={{ borderLeft:'2px solid rgba(196,98,45,0.3)', paddingLeft:12, marginBottom:20 }}>
+                <p style={{ fontFamily:'var(--body)', fontStyle:'italic', fontSize:13, color:'#7a6050', lineHeight:1.65, margin:0 }}>"{entry.prompt}"</p>
               </div>
             )}
 
@@ -191,20 +194,30 @@ export default function JournalPage() {
 
             {/* Video player */}
             {entry.type==='video' && entry.status==='delivered' && entry.media_url && (
-              <video controls src={entry.media_url} style={{ width:'100%', borderRadius:8, marginBottom:14, maxHeight:180 }} />
+              <video controls src={entry.media_url} style={{ width:'100%', borderRadius:8, marginBottom:16, maxHeight:200 }} />
             )}
 
-            {/* Content */}
-            <div style={{ flex:1, overflow:'hidden' }}>
+            {/* Content Display */}
+            <div style={{ flex:1, overflow:'auto', display:'flex', flexDirection:'column' }}>
               {entry.status==='sealed' ? (
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:150, opacity:.48 }}>
-                  <div style={{ fontSize:26, marginBottom:10 }}>🔒</div>
-                  <p style={{ fontFamily:'var(--body)', fontStyle:'italic', fontSize:14, color:'#6a5040', textAlign:'center', lineHeight:1.75 }}>
-                    Resting quietly until<br/>{new Date(entry.delivery_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%' }}>
+                  
+                  {/* Decorative Sealed Envelope */}
+                  <div style={{ position:'relative', width:240, height:150, background:'linear-gradient(135deg,#e8dfc8,#d8cbb0)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 12px 30px rgba(0,0,0,0.12)', border:'1px solid rgba(255,255,255,0.5)' }}>
+                     {/* Envelope flap lines */}
+                     <div style={{ position:'absolute', inset:0, borderTop:'75px solid rgba(0,0,0,0.06)', borderLeft:'120px solid transparent', borderRight:'120px solid transparent', pointerEvents:'none' }} />
+                     
+                     <div style={{ position:'relative', zIndex:10 }}>
+                       <WaxSeal color={entry.seal_color} symbol={entry.seal_emoji} size={68} />
+                     </div>
+                  </div>
+
+                  <p style={{ fontFamily:'var(--body)', fontStyle:'italic', fontSize:16, color:'#6a5040', textAlign:'center', marginTop:36, lineHeight:1.6 }}>
+                    Sealed tight. <br/> No peeking allowed until the date arrives.
                   </p>
                 </div>
               ) : (
-                <p style={{ fontFamily:'var(--body)', fontSize:14.5, lineHeight:2, color:'#2a1e14', whiteSpace:'pre-line', fontStyle:'italic', margin:0 }}>
+                <p style={{ fontFamily:'var(--body)', fontSize:15, lineHeight:2.1, color:'#2a1e14', whiteSpace:'pre-line', margin:0, paddingBottom: 16 }}>
                   {entry.content}
                 </p>
               )}
@@ -218,7 +231,7 @@ export default function JournalPage() {
               </div>
             )}
 
-            <div style={{ textAlign:'right', fontFamily:'var(--mono)', fontSize:8, color:'#b09880', marginTop:8 }}>{page+1}</div>
+            <div style={{ textAlign:'right', fontFamily:'var(--mono)', fontSize:9, color:'#b09880', marginTop:12 }}>PG {page*2+2}</div>
           </div>
         </div>
       </div>

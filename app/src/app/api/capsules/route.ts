@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'delivery_at required' }, { status: 400 })
 
   const deliveryAt = new Date(body.delivery_at)
-  const minDate    = new Date(Date.now() + 30 * 86400000)
+  const minDate    = new Date(Date.now() + 1 * 86400000) // 1 day
   const maxDate    = new Date(Date.now() + 10 * 365.25 * 86400000)
-  if (deliveryAt < minDate) return NextResponse.json({ error: 'Minimum delivery is 1 month from now' }, { status: 400 })
+  if (deliveryAt < minDate) return NextResponse.json({ error: 'Minimum delivery is 1 day from now' }, { status: 400 })
   if (deliveryAt > maxDate) return NextResponse.json({ error: 'Maximum delivery is 10 years from now' }, { status: 400 })
 
   const { data, error } = await sb.from('capsules').insert({

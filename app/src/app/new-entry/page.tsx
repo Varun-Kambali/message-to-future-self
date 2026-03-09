@@ -65,7 +65,11 @@ export default function NewEntryPage() {
   const [type,       setType]      = useState<CapsuleType>('text')
   const [prompt,     setPrompt]    = useState<{ icon: string; text: string } | null>(null)
   const [text,       setText]      = useState('')
-  const [years,      setYears]     = useState(1)
+  const [deliveryDate, setDeliveryDate] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 1)
+    return d.toISOString().split('T')[0]
+  })
   const [sealColor,  setSealColor] = useState('#a02020')
   const [sealSymbol, setSealSymbol]= useState('✦')
   const [sealImgData,setSealImgData]=useState<string|null>(null)
@@ -83,8 +87,46 @@ export default function NewEntryPage() {
   const [mediaBlob,  setMediaBlob]  = useState<Blob | null>(null)
   const [mediaFile,  setMediaFile]  = useState<File | null>(null)
 
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animRef = useRef<number | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia(type === 'audio' ? { audio:true } : { audio:true, video:true })
+    
+    if (type === 'audio') {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      audioCtxRef.current = audioCtx
+      const analyser = audioCtx.createAnalyser()
+      const source = audioCtx.createMediaStreamSource(stream)
+      source.connect(analyser)
+      analyser.fftSize = 256
+      const bufferLength = analyser.frequencyBinCount
+      const dataArray = new Uint8Array(bufferLength)
+
+      const draw = () => {
+        if (!canvasRef.current) return
+        const canvas = canvasRef.current
+        const ctx = canvas.getContext('2d')!
+        animRef.current = requestAnimationFrame(draw)
+
+        analyser.getByteFrequencyData(dataArray)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        
+        const barWidth = (canvas.width / bufferLength) * 2.5
+        let x = 0
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = dataArray[i] / 2
+          const intensity = barHeight + 100
+          ctx.fillStyle = `rgb(${intensity}, 100, 80)`
+          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
+          x += barWidth + 1
+        }
+      }
+      // Start drawing slightly after canvas mounts
+      setTimeout(draw, 50)
+    }
+
     const rec = new MediaRecorder(stream)
     chunksRef.current = []
     rec.ondataavailable = e => chunksRef.current.push(e.data)
@@ -101,6 +143,11 @@ export default function NewEntryPage() {
   function stopRecording() {
     mediaRef.current?.stop()
     setRecording(false)
+    if (animRef.current) cancelAnimationFrame(animRef.current)
+    if (audioCtxRef.current) {
+        audioCtxRef.current.close()
+        audioCtxRef.current = null
+    }
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -127,7 +174,7 @@ export default function NewEntryPage() {
     const { data: { session } } = await sb.auth.getSession()
     if (!session) { router.push('/login'); return }
 
-    const deliveryAt = new Date(Date.now() + years * 365.25 * 86400000).toISOString()
+    const deliveryAt = new Date(deliveryDate).toISOString()
 
     // 1. Upload media if present
     let mediaPath: string | null = null
@@ -261,6 +308,9 @@ export default function NewEntryPage() {
                     <div style={{ fontSize:38, marginBottom:10 }}>{type==='audio'?'🎙':'📹'}</div>
                     {!mediaBlob && !mediaFile ? (
                       <div>
+                        {recording && type === 'audio' && (
+                          <canvas ref={canvasRef} width="240" height="60" style={{ display:'block', margin:'0 auto 16px', borderRadius: 4, background:'rgba(0,0,0,0.02)' }} />
+                        )}
                         <button onClick={recording?stopRecording:startRecording} style={{ background:recording?'#c4622d':'rgba(196,98,45,0.1)', border:`1.5px solid ${recording?'#c4622d':'rgba(196,98,45,0.35)'}`, color:recording?'white':'#c4622d', padding:'10px 24px', fontFamily:'var(--mono)', fontSize:11, letterSpacing:'0.1em', borderRadius:2, cursor:'pointer', marginBottom:10 }}>
                           {recording?'⏹ Stop recording':'⏺ Start recording'}
                         </button>
@@ -283,17 +333,20 @@ export default function NewEntryPage() {
                 </div>
               )}
 
-              {/* Delivery year */}
+              {/* Delivery date */}
               <div style={{ marginTop:22, marginBottom:24 }}>
                 <p style={label}>
-                  Deliver in {years} year{years>1?'s':''} —{' '}
-                  {new Date(Date.now()+years*365.25*86400000).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+                  Deliver on —{' '}
+                  {new Date(deliveryDate).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
                 </p>
-                <input type="range" min={1} max={5} value={years} onChange={e=>setYears(Number(e.target.value))}
-                  style={{ width:'100%', accentColor:'#c4622d' }} />
-                <div style={{ display:'flex', justifyContent:'space-between', fontFamily:'var(--mono)', fontSize:9, color:'#b09880', marginTop:5 }}>
-                  {[1,2,3,4,5].map(y=><span key={y}>{y}yr</span>)}
-                </div>
+                <input 
+                  type="date" 
+                  min={new Date(Date.now() + 86400000).toISOString().split('T')[0]} 
+                  max={new Date(Date.now() + 10 * 365.25 * 86400000).toISOString().split('T')[0]}
+                  value={deliveryDate} 
+                  onChange={e => setDeliveryDate(e.target.value)}
+                  style={{ width:'100%', padding:'10px', fontFamily:'var(--body)', fontSize:16, border:'1px solid rgba(0,0,0,0.1)', borderRadius:6, accentColor:'#c4622d' }} 
+                />
               </div>
 
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
@@ -339,9 +392,12 @@ export default function NewEntryPage() {
                   <p style={{ ...label, marginBottom:16, textAlign:'center' }}>Preview</p>
                   <div style={{ position:'relative', marginBottom:22 }}>
                     {pouring && (
-                      <div style={{ position:'absolute', top:-56, left:'50%', transform:'translateX(-50%)', width:10, borderRadius:4, background:`linear-gradient(180deg, rgba(255,255,255,0.4), ${sealColor})`, animation:'waxDrip 0.95s ease forwards', transformOrigin:'top', zIndex:5 }} />
+                      <>
+                        <div style={{ position:'absolute', top:-56, left:'50%', transform:'translateX(-50%)', width:10, borderRadius:4, background:`linear-gradient(180deg, rgba(255,255,255,0.4), ${sealColor})`, animation:'waxDrip 0.95s ease forwards', transformOrigin:'top', zIndex:5 }} />
+                        <div style={{ position:'absolute', top:'50%', left:'50%', width:80, height:80, borderRadius:'50%', background:sealColor, transform:'translate(-50%, -50%)', animation:'waxPuddle 0.95s ease forwards', zIndex: 4, filter:'drop-shadow(0 4px 10px rgba(0,0,0,0.5))' }} />
+                      </>
                     )}
-                    <div style={{ animation:poured?'sealLand 0.65s cubic-bezier(.34,1.4,.64,1) forwards':'none' }}>
+                    <div style={{ animation:poured?'sealLand 0.65s cubic-bezier(.34,1.4,.64,1) forwards':(pouring?'none':undefined), position:'relative', zIndex:10, opacity: pouring && !poured ? 0 : 1 }}>
                       <WaxSeal color={sealColor} symbol={sealSymbol} imgData={sealImgData} size={120} />
                     </div>
                   </div>
@@ -375,7 +431,7 @@ export default function NewEntryPage() {
               <h2 style={{ fontFamily:'var(--serif)', fontStyle:'italic', fontSize:28, color:'#1c1410', marginTop:24, marginBottom:10 }}>Your capsule is sealed.</h2>
               <p style={{ fontFamily:'var(--body)', fontStyle:'italic', fontSize:15, color:'#7a6050', lineHeight:1.85, maxWidth:360, margin:'0 auto 28px' }}>
                 It&apos;s resting quietly now, waiting. Your future self will find it on{' '}
-                <strong>{new Date(Date.now()+years*365.25*86400000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</strong>.
+                <strong>{new Date(deliveryDate).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</strong>.
               </p>
               <button onClick={handleSave} disabled={saving} style={{ background:'linear-gradient(135deg,#d4a853,#b07830)', color:'#1c140c', padding:'14px 36px', fontFamily:'var(--mono)', fontSize:13, letterSpacing:'0.1em', borderRadius:2, border:'none', cursor:saving?'not-allowed':'pointer', boxShadow:'0 6px 24px rgba(212,168,83,0.4)', opacity:saving?0.75:1 }}>
                 {saving?'Dropping in the mailbox…':'Drop in the mailbox →'}

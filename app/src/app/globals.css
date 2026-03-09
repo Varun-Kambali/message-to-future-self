@@ -40,10 +40,11 @@ body {
 @keyframes floatBook   { 0%,100%{transform:translateY(0) rotateX(4deg) rotateY(-8deg)} 50%{transform:translateY(-7px) rotateX(3deg) rotateY(-6deg)} }
 @keyframes sealLand    { 0%{transform:scale(0.1) rotate(-25deg);opacity:0} 65%{transform:scale(1.08) rotate(3deg);opacity:1} 100%{transform:scale(1) rotate(0deg);opacity:1} }
 @keyframes waxDrip     { 0%{height:0;opacity:0} 50%{height:52px;opacity:1} 100%{height:0;opacity:0;transform:translateY(50px) scaleX(1.5)} }
+@keyframes waxPuddle   { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(0.2); opacity:0.8; } 100% { transform: translate(-50%, -50%) scale(1.4); opacity:1; } }
 @keyframes confettiFall{ 0%{opacity:1;transform:translateY(-10px) rotateZ(0)} 100%{opacity:0;transform:translateY(100vh) rotateZ(600deg)} }
 @keyframes barBounce   { 0%,100%{transform:scaleY(0.35)} 50%{transform:scaleY(1)} }
-@keyframes pageFlipR   { 0%{transform:rotateY(0)} 100%{transform:rotateY(-180deg)} }
-@keyframes pageFlipL   { 0%{transform:rotateY(-180deg)} 100%{transform:rotateY(0)} }
+@keyframes pageFlipR   { 0%{transform:perspective(1200px) rotateY(0) translateZ(0)} 50%{transform:perspective(1200px) rotateY(-90deg) translateZ(40px)} 100%{transform:perspective(1200px) rotateY(-180deg) translateZ(0)} }
+@keyframes pageFlipL   { 0%{transform:perspective(1200px) rotateY(-180deg) translateZ(0)} 50%{transform:perspective(1200px) rotateY(-90deg) translateZ(40px)} 100%{transform:perspective(1200px) rotateY(0) translateZ(0)} }
 @keyframes shimmer     { 0%,100%{opacity:0.5} 50%{opacity:1} }
 @keyframes spin        { to{transform:rotate(360deg)} }
 @keyframes stampDown   { 0%{transform:translateY(-28px) scale(1.08);opacity:0} 65%{transform:translateY(3px) scale(0.97)} 100%{transform:translateY(0) scale(1);opacity:1} }
