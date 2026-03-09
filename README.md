@@ -29,15 +29,14 @@ The whole thing runs on free infrastructure. No subscription, no credit card, no
 
 # Core Features
 
-- **Three capsule types** — written letter, voice recording, or video
-- **Wax seal studio** — 8 wax colours, 12 symbols, upload your own artwork to etch into the seal
+- **Three capsule types** — written letter, voice recording (with live canvas waveform audio visualizer), or video
+- **Wax seal studio** — 8 wax colours, 12 symbols, interactive wax-pooling animations
 - **Reflection prompts** — 8 handwritten prompts to spark honest writing
-- **Leather journal** — 5 cover colours, custom title, animated 3D book on your dashboard
-- **Scheduled delivery** — choose 1 month to 5 years; Vercel cron checks hourly
+- **Leather journal** — massive responsive 3D floating book on a premium cinematic dashboard
+- **Scheduled delivery** — choose exactly when it unlocks, from **1 day up to 10 years** in the future
 - **Delivery email** — beautiful HTML letter sent via Resend on delivery day
-- **Sealed = locked** — capsules are genuinely unreadable until the date arrives
-- **Audio player** — waveform visualizer with live word-by-word transcript highlighting
-- **Page-flip journal** — two-page book spread with CSS 3D flip animation
+- **Sealed = locked** — capsules are genuinely unreadable and secured by strict Supabase RLS
+- **Page-flip journal** — stunning 2-page book spread with CSS 3D realistic flip animation and authentic paper textures
 - **Google + email auth** — via Supabase Auth
 - **Fully free** — Supabase free tier + Vercel Hobby + Resend free tier
 
