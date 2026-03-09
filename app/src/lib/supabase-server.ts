@@ -13,7 +13,7 @@ export function createServerSupabase() {
     {
       cookies: {
         getAll()     { return store.getAll() },
-        setAll(list) {
+        setAll(list: any[]) {
           try { list.forEach(({ name, value, options }) => store.set(name, value, options)) }
           catch { /* called from Server Component; middleware handles refresh */ }
         },
